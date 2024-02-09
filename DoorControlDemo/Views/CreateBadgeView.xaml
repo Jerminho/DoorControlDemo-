@@ -1,0 +1,20 @@
+﻿<Window x:Class="DoorControlDemo.Views.CreateBadgeView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DoorControlDemo.Views"
+        mc:Ignorable="d"
+        Title="CreateBadgeView" Height="450" Width="800">
+    <Grid>
+        <StackPanel Margin="258,130,258,130" Height="NaN" Width="NaN">
+            <TextBlock Text="Create Badge" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+            <TextBlock Text="Badgenumber" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox x:Name="BadgeNumberTextBox" Text="{Binding BadgeId}" Margin="0,0,0,10"/>
+            <Button Content="Create Badge" Command="{Binding CreateBadgeCommand}"/>
+        </StackPanel>
+        <Button x:Name="btnCreateMain" Content="Home" HorizontalAlignment="Left" Margin="152,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateMainCommand}"/>
+        <Button x:Name="btnNavigateToAssignBadge" Content="ASSIGN" HorizontalAlignment="Left" Margin="547,291,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding NavigateToAssignBadgeCommand}"/>
+
+    </Grid>
+</Window>

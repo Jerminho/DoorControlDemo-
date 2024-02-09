@@ -1,0 +1,21 @@
+﻿<Window x:Class="DoorControlDemo.Views.LoginDeviceView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DoorControlDemo.Views"
+        mc:Ignorable="d"
+        Title="LogInDeviceView" Height="450" Width="800">
+    <Grid>
+        <StackPanel Margin="258,50,258,50" Height="NaN" Width="NaN">
+            <TextBlock Text="Log In Device" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+            <TextBlock Text="Device Address" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox x:Name="DeviceAddressTextBox" Text="{Binding Ip}" Margin="0,0,0,10"/>
+            <TextBlock Text="Port" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox x:Name="PortTextBox" Text="{Binding PortNumber}" Margin="0,0,0,10"/>
+            <Button Content="Log In" Command="{Binding LoginCommand}"/>
+        </StackPanel>
+
+        <Button x:Name="btnCreateMain" Content="Home" HorizontalAlignment="Left" Margin="152,315,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateMainCommand}"/>
+    </Grid>
+</Window>
