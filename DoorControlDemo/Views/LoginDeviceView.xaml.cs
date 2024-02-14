@@ -1,4 +1,5 @@
 ﻿using DoorControlDemo.Data;
+using DoorControlDemo.Models;
 using DoorControlDemo.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -25,8 +26,10 @@ namespace DoorControlDemo.Views
         public LoginDeviceView()
         {
             InitializeComponent();
-            DataContext = new LoginDeviceViewModel(((App)Application.Current)._serviceProvider.GetRequiredService<DoorControlDbContext>());
-
+            DataContext = new LoginDeviceViewModel(
+                ((App)Application.Current)._serviceProvider.GetRequiredService<DoorControlDbContext>(),
+                ((App)Application.Current)._serviceProvider.GetRequiredService<ILoginService>()
+            );
         }
     }
 }

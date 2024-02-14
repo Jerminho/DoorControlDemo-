@@ -1,4 +1,5 @@
-﻿using DoorControlDemo.Views;
+﻿using DoorControlDemo.Models;
+using DoorControlDemo.Views;
 using GalaSoft.MvvmLight.Command;
 using System.Windows;
 
@@ -13,6 +14,14 @@ namespace DoorControlDemo.ViewModels
         public RelayCommand LogInDeviceCommand { get; private set; }
         public RelayCommand NavigateToControlDoorCommand { get; private set; }
 
+        private ILoginService loginService;
+
+        // Property to set loginService
+        public ILoginService LoginService
+        {
+            get { return loginService; }
+            set { loginService = value; }
+        }
 
         // Link the commands to their respective actions and call them
         public MainViewModel() 
@@ -56,13 +65,12 @@ namespace DoorControlDemo.ViewModels
         {
             LoginDeviceView loginDeviceView = new();
             loginDeviceView.Show();
-            Application.Current.Windows[0]?.Close();
         }
 
         public void NavigateToControlDoorButtonClick()
         {
             // Set an instance of the ControlDoorView
-            ControlDoorView controlDoorView = new ControlDoorView();
+            ControlDoorView controlDoorView = new ControlDoorView(LoginService);
             // Show the ControlDoorView
             controlDoorView.Show();
             // Close the current window

@@ -1,4 +1,5 @@
 ﻿using DoorControlDemo.Data;
+using DoorControlDemo.Models;
 using DoorControlDemo.ViewModels;
 using DoorControlDemo.Views;
 using Microsoft.EntityFrameworkCore;
@@ -41,13 +42,16 @@ namespace DoorControlDemo
 
             // Register other services and view models as needed
             services.AddSingleton<MainViewModel>();
+            services.AddSingleton<ILoginService, LoginService>(); // Replace LoginService with your actual implementation class
             services.AddTransient<CreateBadgeViewModel>();
             services.AddTransient<CreateDeviceViewModel>();
             services.AddTransient<CreateUserViewModel>();
-            // Add other ViewModel registrations
+
 
             // Build the service provider
             var serviceProvider = services.BuildServiceProvider();
+            // Instantiate the user object
+            Models.User user = new Models.User(); // Your user instantiation logic goes here
 
             // Run the application
             var app = new App(serviceProvider);

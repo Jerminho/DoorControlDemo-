@@ -6,16 +6,49 @@
         xmlns:local="clr-namespace:DoorControlDemo.Views"
         mc:Ignorable="d"
         Title="LogInDeviceView" Height="450" Width="800">
-    <Grid>
-        <StackPanel Margin="258,50,258,50" Height="NaN" Width="NaN">
-            <TextBlock Text="Log In Device" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-            <TextBlock Text="Device Address" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
-            <TextBox x:Name="DeviceAddressTextBox" Text="{Binding Ip}" Margin="0,0,0,10"/>
-            <TextBlock Text="Port" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
-            <TextBox x:Name="PortTextBox" Text="{Binding PortNumber}" Margin="0,0,0,10"/>
-            <Button Content="Log In" Command="{Binding LoginCommand}"/>
-        </StackPanel>
 
-        <Button x:Name="btnCreateMain" Content="Home" HorizontalAlignment="Left" Margin="152,315,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateMainCommand}"/>
+    <Grid Margin="20">
+        <!-- Login Form -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Device Address -->
+        <TextBlock Text="Device Address:" Grid.Row="0" Grid.Column="0" Margin="0,0,5,5" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding DeviceAddress}" Grid.Row="0" Grid.Column="1" Margin="0,0,5,5"/>
+
+        <!-- User Name -->
+        <TextBlock Text="User Name:" Grid.Row="1" Grid.Column="0" Margin="0,5,5,5" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding UserName}" Grid.Row="1" Grid.Column="1" Margin="0,5,5,5"/>
+
+        <!-- Password -->
+        <TextBlock Text="Password:" Grid.Row="2" Grid.Column="0" Margin="0,5,5,5" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Password}" Grid.Row="2" Grid.Column="1" Margin="0,5,5,5"/>
+
+        <!-- Port -->
+        <TextBlock Text="Port:" Grid.Row="3" Grid.Column="0" Margin="0,5,5,5" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Port}" Grid.Row="3" Grid.Column="1" Margin="0,5,5,5"/>
+
+        <!-- Login Button -->
+        <Button Content="Login" Command="{Binding LoginCommand}" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+
+        <!-- Door Control Buttons -->
+        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <Button Content="Open Door" Command="{Binding OpenDoorCommand}" Margin="5"/>
+            <Button Content="Close Door" Command="{Binding CloseDoorCommand}" Margin="5"/>
+            <Button Content="Stay Open" Command="{Binding StayOpenCommand}" Margin="5"/>
+            <Button Content="Stay Close" Command="{Binding StayCloseCommand}" Margin="5"/>
+        </StackPanel>
     </Grid>
+
 </Window>

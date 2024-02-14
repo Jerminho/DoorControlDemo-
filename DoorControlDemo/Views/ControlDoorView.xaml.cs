@@ -1,4 +1,5 @@
 ﻿using DoorControlDemo.Data;
+using DoorControlDemo.Models;
 using DoorControlDemo.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -22,10 +23,15 @@ namespace DoorControlDemo.Views
     /// </summary>
     public partial class ControlDoorView : Window
     {
-        public ControlDoorView()
+        public ControlDoorView(ILoginService loginService)
         {
             InitializeComponent();
-            //DataContext = new ControlDoorOperationsViewModel(((App)Application.Current)._serviceProvider.GetRequiredService<DoorControlDbContext>());
+
+           /* // Create an instance of ControlDoorViewModel with the provided login service
+            ControlDoorViewModel viewModel = new ControlDoorViewModel(loginService);
+
+            // Set the DataContext of the view to the ViewModel
+            DataContext = viewModel;*/
         }
     }
 }

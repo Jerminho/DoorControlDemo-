@@ -11,23 +11,18 @@ namespace DoorControlDemo.Models
     internal class ControlDoor
     {
         // Declare the properties
-        public int Id { get; set; }
-
-        // User instance to get the role
-        private User _user;
-
+        public static int m_UserID = 1;
         // Constructor to initialize the ControlDoor with a user instance
-        public ControlDoor(User user)
+        public ControlDoor()
         {
-            _user = user;
+            
         }
 
         // Implementation of the SDK Door commands
         public void OpenDoor()
         {
-            int userId = _user.Role; // Get the role from the user
 
-            if (CHCNetSDK.NET_DVR_ControlGateway(userId, 1, 1))
+            if (CHCNetSDK.NET_DVR_ControlGateway(m_UserID, 1, 1))
             {
                 MessageBox.Show("NET_DVR_ControlGateway: open door succeed");
             }
@@ -41,9 +36,8 @@ namespace DoorControlDemo.Models
 
         public void CloseDoor()
         {
-            int userId = _user.Role; // Get the role from the user
 
-            if (CHCNetSDK.NET_DVR_ControlGateway(userId, 1, 0))
+            if (CHCNetSDK.NET_DVR_ControlGateway(m_UserID, 1, 0))
             {
                 MessageBox.Show("NET_DVR_ControlGateway: close door succeed");
             }
@@ -55,9 +49,8 @@ namespace DoorControlDemo.Models
 
         public void StayOpen()
         {
-            int userId = _user.Role; // Get the role from the user
 
-            if (CHCNetSDK.NET_DVR_ControlGateway(userId, 1, 3))
+            if (CHCNetSDK.NET_DVR_ControlGateway(m_UserID, 1, 3))
             {
                 MessageBox.Show("NET_DVR_ControlGateway: stay close door succeed");
             }
@@ -69,9 +62,7 @@ namespace DoorControlDemo.Models
 
         public void StayClose()
         {
-            int userId = _user.Role; // Get the role from the user
-
-            if (CHCNetSDK.NET_DVR_ControlGateway(userId, 1, 2))
+            if (CHCNetSDK.NET_DVR_ControlGateway(m_UserID, 1, 2))
             {
                 MessageBox.Show("NET_DVR_ControlGateway: stay open door succeed");
             }
