@@ -11,10 +11,10 @@
             <TextBlock Text="Create User" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
             <TextBlock Text="User Name" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
             <TextBox x:Name="UserNameTextBox" Text="{Binding UserName}" Margin="0,0,0,10"/>
-            <TextBlock Text="Email" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
-            <TextBox x:Name="UserMailTextBox" Text="{Binding UserMail}" Margin="0,0,0,10"/>
-            <TextBlock Text="Phone number" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
-            <TextBox x:Name="UserPhoneNumberTextBox" Text="{Binding UserPhoneNumber}" Margin="0,0,0,10"/>
+            <TextBlock Text="User Id" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox x:Name="UserId" Text="{Binding UserId}" Margin="0,0,0,10"/>
+            <TextBlock Text="Card number" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox x:Name="CardNoTextBox" Text="{Binding UserCardNo}" Margin="0,0,0,10"/>
             <Button Content="Create User" Command="{Binding CreateUserCommand}"/>
         </StackPanel>
         <Button x:Name="btnCreateMain" Content="Home" HorizontalAlignment="Left" Margin="152,315,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateMainCommand}"/>

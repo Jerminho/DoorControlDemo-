@@ -31,6 +31,7 @@ namespace DoorControlDemo.ViewModels
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(DbContext));
             LoginCommand = new RelayCommand(LoginDeviceButtonClick);
+            SetUserCommand = new RelayCommand(SetUserClick);
             _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
             CreateMainCommand = new RelayCommand(() => NavigateToWindow(new MainWindow()));
 
@@ -42,6 +43,8 @@ namespace DoorControlDemo.ViewModels
         }
 
         public ICommand LoginCommand { get; set; }
+
+        public ICommand SetUserCommand { get; set; }
         public ICommand CreateMainCommand { get; set; }
 
         // Door control commands
@@ -49,6 +52,8 @@ namespace DoorControlDemo.ViewModels
         public ICommand CloseDoorCommand { get; private set; }
         public ICommand StayOpenCommand { get; private set; }
         public ICommand StayCloseCommand { get; private set; }
+
+        //LOGIN
 
         private string _deviceAddress;
         public string DeviceAddress
@@ -94,6 +99,43 @@ namespace DoorControlDemo.ViewModels
             }
         }
 
+        // Set User
+        private string _setUserName;
+        public string SetUserName
+        {
+            get => _setUserName;
+            set
+            {
+                _setUserName = value;
+                OnPropertyChanged(nameof(SetUserName));
+            }
+        }
+
+        private string _userId;
+        public string UserId
+        {
+            get => _userId;
+            set
+            {
+                _userId = value;
+                OnPropertyChanged(nameof(UserId));
+            }
+        }
+
+        
+        private string _cardNumber;
+        public string CardNumber
+        {
+            get => _cardNumber;
+            set
+            {
+                _cardNumber = value;
+                OnPropertyChanged(nameof(CardNumber));
+            }
+        }
+
+
+
         private void LoginDeviceButtonClick()
         {
             if (string.IsNullOrEmpty(DeviceAddress) || string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
@@ -104,10 +146,28 @@ namespace DoorControlDemo.ViewModels
             else
             {
                 loginDevice();
-                getUserByCardNo("0010517883");
+                MessageBox.Show("Login Successful");
+                /*getUserByCardNo("0010517883");*/
+                /* uploadCardNo("6","oran","0010517866");
+                 uploadCardNo(_userId, _setUserName, _cardNumber);*/
 
             }
 
+        }
+
+        private void SetUserClick()
+        {
+            if (string.IsNullOrEmpty(DeviceAddress) || string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
+            {
+                _messageBoxDisplay.DisplayMessage("Device address, username, and password are required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            else
+            {
+                loginDevice();
+                uploadCardNo(_userId, _setUserName, _cardNumber);
+
+            }
         }
 
         // Method to check if door operations can be performed
@@ -417,7 +477,7 @@ namespace DoorControlDemo.ViewModels
                 }
                 else
                 {
-                    //MessageBox.Show("unknown status error: " + CHCNetSDK.NET_DVR_GetLastError());
+                    MessageBox.Show("unknown status error: " + CHCNetSDK.NET_DVR_GetLastError());
                     break;
                 }
             }
@@ -474,7 +534,7 @@ namespace DoorControlDemo.ViewModels
             {
                 // Login successful
                 m_UserID = lUserID;
-                MessageBox.Show("Login Successful");
+                
                 _loginService.IsLoggedIn = true;
                 isLoggedIn = true;
             }
@@ -673,115 +733,7 @@ namespace DoorControlDemo.ViewModels
             }
         }
 
-        /*int structSize = Marshal.SizeOf(typeof(NET_DVR_CARD_CFG_V50));
-        NET_DVR_CARD_CFG_V50 lpCardCfg = new();*/
-
-        /*
-                lpCardCfg = Marshal.PtrToStructure<NET_DVR_CARD_CFG_V50>(lpBuffer);*/
-
-
-
-        /* IntPtr lpbufferPtr = Marshal.AllocHGlobal(Marshal.SizeOf(lpCardCfg));
-         Marshal.Copy(lpbuffer, 0, lpbufferPtr, Marshal.SizeOf(lpCardCfg));
-                 lpCardCfg = (NET_DVR_CARD_CFG_V50) Marshal.PtrToStructure(lpbufferPtr, typeof(NET_DVR_CARD_CFG_V50));
-         Marshal.FreeHGlobal(lpbufferPtr);*/
-
-
-        /*public void GetGatewayCardCallBack()
-        {
-            // Prepare the login info
-            CHCNetSDK.NET_DVR_USER_LOGIN_INFO loginInfo = new CHCNetSDK.NET_DVR_USER_LOGIN_INFO();
-            CHCNetSDK.NET_DVR_DEVICEINFO_V40 deviceInfo = new CHCNetSDK.NET_DVR_DEVICEINFO_V40();
-            deviceInfo.struDeviceV30.sSerialNumber = new byte[CHCNetSDK.SERIALNO_LEN];
-            loginInfo.sDeviceAddress = DeviceAddress;
-            loginInfo.sUserName = UserName;
-            loginInfo.sPassword = Password;
-
-            ushort.TryParse(Port, out loginInfo.wPort);
-
-            int lUserID = 1;
-            lUserID = CHCNetSDK.NET_DVR_Login_V40(ref loginInfo, ref deviceInfo);
-
-
-            CHCNetSDK.NET_DVR_CARD_CFG_COND struCond = new CHCNetSDK.NET_DVR_CARD_CFG_COND();
-            struCond.dwSize = (uint)Marshal.SizeOf(struCond);
-            //ID DEL DISPOSITIVO
-            struCond.wLocalControllerID = 0;
-            struCond.dwCardNum = 1;
-            struCond.byCheckCardNo = 1;
-
-            int dwSize = Marshal.SizeOf(struCond);
-            int dwSize2 = Marshal.SizeOf(loginInfo);
-            IntPtr ptrStruCond = Marshal.AllocHGlobal(dwSize);
-            IntPtr pUserData = Marshal.AllocHGlobal(dwSize2);
-            Marshal.StructureToPtr(struCond, ptrStruCond, false);
-            Marshal.StructureToPtr(loginInfo, pUserData, false);
-
-
-            g_fGetGatewayCardCallback = new RemoteConfigCallback(ProcessGetGatewayCardCallback3);
-            m_lGetCardCfgHandle = CHCNetSDK.NET_DVR_StartRemoteConfig(m_UserID, CHCNetSDK.NET_DVR_GET_CARD_CFG_V50, ptrStruCond, dwSize, g_fGetGatewayCardCallback, pUserData);
-
-        }
-
-        private void ProcessGetGatewayCardCallback3(uint dwType, IntPtr lpBuffer, uint dwBufLen, IntPtr pUserData)
-        {
-            if (pUserData == null)
-            {
-                return;
-            }
-
-            if (dwType == (uint)CHCNetSDK.NET_SDK_CALLBACK_TYPE.NET_SDK_CALLBACK_TYPE_DATA)
-            {
-                CHCNetSDK.NET_DVR_CARD_CFG_V50 struCardCfg = new CHCNetSDK.NET_DVR_CARD_CFG_V50();
-                struCardCfg = (CHCNetSDK.NET_DVR_CARD_CFG_V50)Marshal.PtrToStructure(lpBuffer, typeof(CHCNetSDK.NET_DVR_CARD_CFG_V50));
-                string strCardNo = System.Text.Encoding.UTF8.GetString(struCardCfg.byCardNo);
-                IntPtr pCardInfo = Marshal.AllocHGlobal(Marshal.SizeOf(struCardCfg));
-                Marshal.StructureToPtr(struCardCfg, pCardInfo, true);
-                //CHCNetSDK.PostMessage(pUserData, 1003, (int)pCardInfo, 0);
-
-                _logger.LogInformation("Agregando información.");
-                cardInfos.Add(struCardCfg);
-
-
-            }
-            else
-            {
-                if (dwType == (uint)CHCNetSDK.NET_SDK_CALLBACK_TYPE.NET_SDK_CALLBACK_TYPE_STATUS)
-                {
-                    uint dwStatus = (uint)Marshal.ReadInt32(lpBuffer);
-                    if (dwStatus == (uint)CHCNetSDK.NET_SDK_CALLBACK_STATUS_NORMAL.NET_SDK_CALLBACK_STATUS_SUCCESS)
-                    {
-                        _logger.LogInformation("NET_DVR_GET_CARD_CFG_V50 finalizo");
-                        CHCNetSDK.PostMessage(pUserData, 1002, 0, 0);
-                    }
-                    else if (dwStatus == (uint)CHCNetSDK.NET_SDK_CALLBACK_STATUS_NORMAL.NET_SDK_CALLBACK_STATUS_FAILED)
-                    {
-                        uint dwErrorCode = (uint)Marshal.ReadInt32(lpBuffer + 1);
-                        string cardNumber = Marshal.PtrToStringAnsi(lpBuffer + 2);
-                        _logger.LogError($"NET_DVR_GET_CARD_CFG_V50 fallo, ErrorCode:{dwErrorCode},CardNo:{cardNumber}");
-                        CHCNetSDK.PostMessage(pUserData, 1002, 0, 0);
-                    }
-                }
-            }
-            return;
-        }*/
-
-
-        //-------------------------------------------------------------
-
-        // Card management
-        /*
-                public int StartRemoteConfig(ref info, uint dwCommand, IntPtr lpInBuffer, uint dwInBufferLen, IntPtr pUserData)
-                {
-                    info.RemoteId = CHCNetSDK.NET_DVR_StartRemoteConfig(lUserId, dwCommand, lpInBuffer, dwInBufferLen, RemoteConfigCallback, pUserData);
-                    return info.RemoteId;
-                }*/
-        /*
-                CHCNetSDK.NET_DVR_CARD_CFG_COND struCond = new CHCNetSDK.NET_DVR_CARD_CFG_COND();*/
-        //str
-
-
-
+       
 
         // Methods for door control
         private void OpenDoor()

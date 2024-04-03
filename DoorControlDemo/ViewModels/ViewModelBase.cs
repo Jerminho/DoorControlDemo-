@@ -48,5 +48,57 @@ namespace DoorControlDemo.ViewModels
             window.Show();
             /*Application.Current.Windows[0]?.Close();*/
         }
+
+        public static int m_UserID = 1;
+        public void loginDevice()
+        {
+            bool isLoggedIn = false;
+
+            // Prepare the login info
+            CHCNetSDK.NET_DVR_USER_LOGIN_INFO loginInfo = new CHCNetSDK.NET_DVR_USER_LOGIN_INFO();
+            CHCNetSDK.NET_DVR_DEVICEINFO_V40 deviceInfo = new CHCNetSDK.NET_DVR_DEVICEINFO_V40();
+            deviceInfo.struDeviceV30.sSerialNumber = new byte[CHCNetSDK.SERIALNO_LEN];
+            loginInfo.sDeviceAddress = "192.0.0.64";
+            loginInfo.sUserName = "admin";
+            loginInfo.sPassword = "Vika12345";
+
+            ushort.TryParse("8000", out loginInfo.wPort);
+
+            int lUserID = 1;
+            lUserID = CHCNetSDK.NET_DVR_Login_V40(ref loginInfo, ref deviceInfo);
+            if (lUserID < 0)
+            {
+                uint errorCode = CHCNetSDK.NET_DVR_GetLastError();
+
+                if (errorCode == CHCNetSDK.NET_DVR_PASSWORD_ERROR)
+                {
+                    MessageBox.Show("user name or password error!");
+                    if (1 == deviceInfo.bySupportLock)
+                    {
+                        string strTemp1 = string.Format("Left {0} try opportunity", deviceInfo.byRetryLoginTime);
+                        MessageBox.Show(strTemp1);
+                    }
+                }
+                else if (errorCode == CHCNetSDK.NET_DVR_USER_LOCKED)
+                {
+                    if (1 == deviceInfo.bySupportLock)
+                    {
+                        string strTemp1 = string.Format("user is locked, the remaining lock time is {0}", deviceInfo.dwSurplusLockTime);
+                        MessageBox.Show(strTemp1);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("net error or dvr is busy!");
+                }
+            }
+            else
+            {
+                // Login successful
+                m_UserID = lUserID;
+                MessageBox.Show("Login Successful");
+                isLoggedIn = true;
+            }
+        }
     }
 }

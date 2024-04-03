@@ -7,7 +7,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+
         <Button x:Name="btnCreateBadge" Content="Create Badge" HorizontalAlignment="Left" Margin="152,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateBadgeCommand}"/>
         <Button x:Name="btnCreateDevice" Content="Create Device" HorizontalAlignment="Left" Margin="327,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateDeviceCommand}"/>
         <Button x:Name="btnCreateUser" Content="Create User" HorizontalAlignment="Left" Margin="503,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateUserCommand}"/>

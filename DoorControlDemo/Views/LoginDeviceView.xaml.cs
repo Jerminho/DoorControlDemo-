@@ -31,5 +31,6 @@ namespace DoorControlDemo.Views
                 ((App)Application.Current)._serviceProvider.GetRequiredService<ILoginService>()
             );
         }
+
     }
 }

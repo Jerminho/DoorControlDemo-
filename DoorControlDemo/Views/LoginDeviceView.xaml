@@ -16,6 +16,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="38*"/>
+            <RowDefinition Height="167*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -24,31 +26,38 @@
         </Grid.ColumnDefinitions>
 
         <!-- Device Address -->
-        <TextBlock Text="Device Address:" Grid.Row="0" Grid.Column="0" Margin="0,0,5,5" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding DeviceAddress}" Grid.Row="0" Grid.Column="1" Margin="0,0,5,5"/>
+        <TextBlock Text="Ip Address:" Grid.Row="0" Grid.Column="0" Margin="0,0,5,11" VerticalAlignment="Bottom"/>
+        <TextBox Text="{Binding DeviceAddress}" Grid.Row="0" Margin="66,0,574,14" Grid.ColumnSpan="2"/>
 
         <!-- User Name -->
-        <TextBlock Text="User Name:" Grid.Row="1" Grid.Column="0" Margin="0,5,5,5" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding UserName}" Grid.Row="1" Grid.Column="1" Margin="0,5,5,5"/>
+        <TextBlock Text="User Name:" Grid.Row="1" Grid.Column="0" Margin="0,0,5,0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding UserName}" Grid.Row="1" Margin="66,5,574,6" Grid.ColumnSpan="2"/>
 
         <!-- Password -->
-        <TextBlock Text="Password:" Grid.Row="2" Grid.Column="0" Margin="0,5,5,5" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding Password}" Grid.Row="2" Grid.Column="1" Margin="0,5,5,5"/>
+        <TextBlock Text="Password:" Grid.Row="2" Grid.Column="0" Margin="0,0,5,0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Password}" Grid.Row="2" Margin="66,5,574,6" Grid.ColumnSpan="2"/>
 
         <!-- Port -->
-        <TextBlock Text="Port:" Grid.Row="3" Grid.Column="0" Margin="0,5,5,5" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding Port}" Grid.Row="3" Grid.Column="1" Margin="0,5,5,5"/>
+        <TextBlock Text="Port:" Grid.Row="3" Grid.Column="0" Margin="0,0,5,0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding Port}" Grid.Row="3" Margin="66,5,574,6" Grid.ColumnSpan="2"/>
 
         <!-- Login Button -->
-        <Button Content="Login" Command="{Binding LoginCommand}" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+        <Button Content="Login" Command="{Binding LoginCommand}" Grid.Row="4" Grid.Column="1" Margin="10,4,0,37" HorizontalAlignment="Left"/>
 
         <!-- Door Control Buttons -->
-        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+        <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="150,89,0,33">
             <Button Content="Open Door" Command="{Binding OpenDoorCommand}" Margin="5"/>
             <Button Content="Close Door" Command="{Binding CloseDoorCommand}" Margin="5"/>
             <Button Content="Stay Open" Command="{Binding StayOpenCommand}" Margin="5"/>
             <Button Content="Stay Close" Command="{Binding StayCloseCommand}" Margin="5"/>
         </StackPanel>
+        <TextBlock Text="User Name:" Grid.Row="1" Grid.Column="1" Margin="188,0,445,0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding SetUserName}" Grid.Row="1" Margin="254,4,320,7" Grid.Column="1"/>
+        <TextBlock Text="User Id:" Grid.Row="2" Grid.Column="1" Margin="188,0,445,0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding UserId}" Grid.Row="2" Margin="254,4,320,7" Grid.Column="1"/>
+        <TextBlock Text="Card No:" Grid.Row="3" Grid.Column="1" Margin="188,0,445,0" VerticalAlignment="Center"/>
+        <TextBox Text="{Binding CardNumber}" Grid.Row="3" Margin="254,4,320,7" Grid.Column="1"/>
+        <Button Content="Create User" Command="{Binding SetUserCommand}" Grid.Row="4" Grid.Column="1" Margin="281,0,0,32" HorizontalAlignment="Left"/>
     </Grid>
 
 </Window>
