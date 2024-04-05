@@ -58,6 +58,8 @@
         <TextBlock Text="Card No:" Grid.Row="3" Grid.Column="1" Margin="188,0,445,0" VerticalAlignment="Center"/>
         <TextBox Text="{Binding CardNumber}" Grid.Row="3" Margin="254,4,320,7" Grid.Column="1"/>
         <Button Content="Create User" Command="{Binding SetUserCommand}" Grid.Row="4" Grid.Column="1" Margin="281,0,0,32" HorizontalAlignment="Left"/>
+        <TextBox Text="{Binding CardDeletionNo}" Grid.Row="2" Margin="482,14,92,26" Grid.Column="1" Grid.RowSpan="2"/>
+        <Button Content="Delete Card" Command="{Binding DeleteUserCommand}" Grid.Row="3" Grid.Column="1" Margin="509,28,0,33" HorizontalAlignment="Left" Grid.RowSpan="2"/>
     </Grid>
 
 </Window>

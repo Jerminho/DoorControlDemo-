@@ -14,11 +14,11 @@
         </Grid.RowDefinitions>
 
 
-        <Button x:Name="btnCreateBadge" Content="Create Badge" HorizontalAlignment="Left" Margin="152,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateBadgeCommand}"/>
-        <Button x:Name="btnCreateDevice" Content="Create Device" HorizontalAlignment="Left" Margin="327,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateDeviceCommand}"/>
-        <Button x:Name="btnCreateUser" Content="Create User" HorizontalAlignment="Left" Margin="503,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateUserCommand}"/>
-        <Button x:Name="btnLogInDevice" Content="Log In Device" HorizontalAlignment="Left" Margin="152,142,0,0" VerticalAlignment="Top" Height="75" Width="100" Command="{Binding LogInDeviceCommand}"/>
-        <Button x:Name="btnControlDoor" Content="Control Door" HorizontalAlignment="Left" Margin="678,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding NavigateToControlDoorCommand}"/>
+        <Button x:Name="btnCreateBadge" Content="Create Badge" Visibility="Hidden" HorizontalAlignment="Left" Margin="152,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateBadgeCommand}"/>
+        <Button x:Name="btnCreateDevice" Content="Create Device" Visibility="Hidden" HorizontalAlignment="Left" Margin="327,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateDeviceCommand}"/>
+        <Button x:Name="btnCreateUser" Content="Create User" Visibility="Hidden" HorizontalAlignment="Left" Margin="503,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding CreateUserCommand}"/>
+        <Button x:Name="btnLogInDevice" Content="Log In Device"  HorizontalAlignment="Left" Margin="327,180,0,0" VerticalAlignment="Top" Height="75" Width="100" Command="{Binding LogInDeviceCommand}"/>
+        <Button x:Name="btnControlDoor" Content="Control Door" Visibility="Hidden" HorizontalAlignment="Left" Margin="678,281,0,0" VerticalAlignment="Top" Height="30" Width="100" Command="{Binding NavigateToControlDoorCommand}"/>
 
     </Grid>
 </Window>

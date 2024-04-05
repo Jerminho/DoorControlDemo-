@@ -37,6 +37,7 @@ namespace DoorControlDemo.ViewModels
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(DbContext));
             LoginCommand = new RelayCommand(LoginDeviceButtonClick);
             SetUserCommand = new RelayCommand(SetUserClick);
+            DeleteUserCommand = new RelayCommand(DeleteUserClick);
             _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
             CreateMainCommand = new RelayCommand(() => NavigateToWindow(new MainWindow()));
 
@@ -50,6 +51,7 @@ namespace DoorControlDemo.ViewModels
         public ICommand LoginCommand { get; set; }
 
         public ICommand SetUserCommand { get; set; }
+        public ICommand DeleteUserCommand { get; set; }
         public ICommand CreateMainCommand { get; set; }
 
         // Door control commands
@@ -140,6 +142,17 @@ namespace DoorControlDemo.ViewModels
         }
 
 
+        private string _CardDeletionNo;
+        public string CardDeletionNo
+        {
+            get => _CardDeletionNo;
+            set
+            {
+                _CardDeletionNo = value;
+                OnPropertyChanged(nameof(CardDeletionNo));
+            }
+        }
+
 
         private void LoginDeviceButtonClick()
         {
@@ -152,11 +165,6 @@ namespace DoorControlDemo.ViewModels
             {
                 loginDevice();
                 MessageBox.Show("Login Successful");
-                getUserByCardNo("0010517883");
-
-                /*SetVerifyWeekPlan(00000071);*/
-                /* uploadCardNo("6","oran","0010517866");
-                 uploadCardNo(_userId, _setUserName, _cardNumber);*/
 
             }
 
@@ -177,14 +185,22 @@ namespace DoorControlDemo.ViewModels
             }
         }
 
-        // Method to check if door operations can be performed
-        private bool CanOperateDoor()
+        private void DeleteUserClick()
         {
-            // Check if the user is logged in
-            return _loginService.IsLoggedIn;
+            try
+            {
+                getUserByCardNo(CardDeletionNo);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            deleteCardNo(_CardDeletionNo);
         }
 
-        //
+
+        // works, but redundant. unused in program
         public void getUserByCardNo(string cardNo)
         {
             string doorCardNo;
@@ -258,7 +274,7 @@ namespace DoorControlDemo.ViewModels
                         doorEmployeeNo = struData.byName.ToString();
                         doorUserName = System.Text.Encoding.Default.GetString(struData.byName);
                         MessageBox.Show(doorEmployeeNo);
-                        MessageBox.Show("NET_DVR_GET_CARD success" + doorUserName + " "+ doorEmployeeNo + doorCardNo);
+                        MessageBox.Show("NET_DVR_GET_CARD success: " + cardNo.ToString());
                     }
                     else if (dwState == (int)CHCNetSDK.NET_SDK_SENDWITHRECV_STATUS.NET_SDK_CONFIG_STATUS_FINISH)
                     {
@@ -285,8 +301,7 @@ namespace DoorControlDemo.ViewModels
 
 
         }
-
-        // To be used
+        
         public void deleteCardNo(string cardNo)
         {
             if (m_lDelCardCfgHandle != -1)
@@ -372,6 +387,7 @@ namespace DoorControlDemo.ViewModels
         }
 
         // Create and send user to device
+        // RUNS, after creation, IVMS must import data sent from the device.
         public void uploadCardNo(string employeeNo, string userName, string cardNo)
         {
             if (m_lSetCardCfgHandle != -1)
@@ -547,10 +563,16 @@ namespace DoorControlDemo.ViewModels
                 _loginService.IsLoggedIn = true;
                 isLoggedIn = true;
 
-                // Call the method to get and show holiday plans
+                // Call the method to set reader plan teamplate
+                // get the readerplan with the template
+                // and then set the reader plan to the cuser
 
-                GetCardReadWeekPlanInfo("192.0.0.64", 0010592488, ref weekPlanCfg);
-                SetCardReadWeekPlanInfo("192.0.0.64", 0010592488,plan);
+                // User should not be able to authenticate with card outside the specified timeframe in the tempalte
+                // However, even though code runs correctly, authentication remains.
+
+                //Calling the method here for testing purposes, no UI made yet
+
+                /*SetVerifyWeekPlanAndCardReaderPlan(m_UserID);*/
             }
         }
 
@@ -563,13 +585,6 @@ namespace DoorControlDemo.ViewModels
         bool bGetCardCfgFinish = false;
         bool bSetCardCfgFinish = false;
 
-
-
-
-        //------------------------- HOLIDAYS
-
-        // Define the command value for getting holiday plans
-        public const int NET_DVR_GET_VERIFY_HOLIDAY_PLAN = 2128;
 
         // Structure for holiday plan configuration
         public struct NET_DVR_HOLIDAY_PLAN_CFG
@@ -599,240 +614,83 @@ namespace DoorControlDemo.ViewModels
 
 
         CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT[] plan;
-
-        public struct NET_DVR_SINGLE_PLAN_SEGMENT
-        {
-            // Define the structure fields according to your requirement
-            // For example:
-            public byte byEnable;
-            public byte byDoorStatus;
-            // Add other fields as needed
-
-            // Initialize the structure
-            public void Init()
-            {
-                byEnable = 0;
-                byDoorStatus = 0;
-                // Initialize other fields
-            }
-        }
-
-        // Function to get existing holiday schedule configurations
-        public bool GetHolidayPlans(int lUserID, out NET_DVR_HOLIDAY_PLAN_CFG holidayPlans)
-        {
-            holidayPlans = new NET_DVR_HOLIDAY_PLAN_CFG();
-            holidayPlans.Init();
-
-            IntPtr ptrHolidayPlans = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(NET_DVR_HOLIDAY_PLAN_CFG)));
-            Marshal.StructureToPtr(holidayPlans, ptrHolidayPlans, false);
-
-            uint lpBytesReturned = 0;
-            bool bRet = CHCNetSDK.NET_DVR_GetDVRConfig(lUserID, NET_DVR_GET_VERIFY_HOLIDAY_PLAN, 0, ptrHolidayPlans, (uint)Marshal.SizeOf(typeof(NET_DVR_HOLIDAY_PLAN_CFG)), ref lpBytesReturned);
-
-            if (!bRet)
-            {
-                MessageBox.Show($"Failed to get holiday plans, error code: {CHCNetSDK.NET_DVR_GetLastError()}");
-                Marshal.FreeHGlobal(ptrHolidayPlans);
-                return false;
-            }
-
-            holidayPlans = Marshal.PtrToStructure<NET_DVR_HOLIDAY_PLAN_CFG>(ptrHolidayPlans);
-            Marshal.FreeHGlobal(ptrHolidayPlans);
-            return true;
-        }
-
-        // Function to get existing holiday schedule configurations and display them in a MessageBox
-        public bool GetAndShowHolidayPlans(int lUserID)
-        {
-            NET_DVR_HOLIDAY_PLAN_CFG holidayPlans;
-            bool success = GetHolidayPlans(lUserID, out holidayPlans);
-            if (!success)
-            {
-                MessageBox.Show("Failed to get holiday plans." + NET_DVR_GetLastError());
-                return false;
-            }
-
-            StringBuilder message = new StringBuilder();
-            message.AppendLine("Holiday Plans:");
-
-            for (int i = 0; i < holidayPlans.struPlanCfg.Length; i++)
-            {
-                NET_DVR_SINGLE_PLAN_SEGMENT segment = holidayPlans.struPlanCfg[i];
-                message.AppendLine($"Plan {i + 1}:");
-                message.AppendLine($"    Enable: {segment.byEnable}");
-                message.AppendLine($"    Door Status: {segment.byDoorStatus}");
-                // Add other fields as needed
-
-                // You can customize the message format as per your requirement
-            }
-
-            MessageBox.Show(message.ToString());
-            return true;
-        }
-
-        //------------------------ HOLIDAYS
-
-        
-
-        const int NET_DVR_GET_WEEK_PLAN_CFG = 2100; //get door status week plan config 
-        public bool GetWeekPlanInfo(int userId, int chanel, int cmd, ref CHCNetSDK.NET_DVR_WEEK_PLAN_CFG weekPlan)
-        {
-            uint dwSize = (uint)Marshal.SizeOf(weekPlan);
-            IntPtr ptrIpParaCfgV40 = Marshal.AllocHGlobal((int)dwSize);
-            Marshal.StructureToPtr(weekPlan, ptrIpParaCfgV40, false);
-            uint dwReturn = 0;
-            bool b = CHCNetSDK.NET_DVR_GetDVRConfig(userId, (uint)cmd, chanel, ptrIpParaCfgV40, dwSize, ref dwReturn);
-            if (b)
-            {
-                weekPlan = (CHCNetSDK.NET_DVR_WEEK_PLAN_CFG)Marshal.PtrToStructure(ptrIpParaCfgV40, typeof(CHCNetSDK.NET_DVR_WEEK_PLAN_CFG));
-                Marshal.FreeHGlobal(ptrIpParaCfgV40);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public bool GetCardReadWeekPlanInfo(string doorIp, int cardReadNo, ref CHCNetSDK.NET_DVR_WEEK_PLAN_CFG weekPlan)
-        {
-            
-                /*DoorUseInfo info = useInfos.Find(o => o.DeviceIp == doorIp);
-                if (info.DeviceIp == null)
-                    return false;*/
-                if (GetWeekPlanInfo(m_UserID, cardReadNo, NET_DVR_GET_VERIFY_WEEK_PLAN, ref weekPlan))
-                {
-                    MessageBox.Show(string.Format("Access control host--{0}  Card reader--{1}  Card reader weekly plan enable--{2}", doorIp, cardReadNo, weekPlan.byEnable == 0 ? "No" : "Yes"));
-                    if (weekPlan.struPlanCfg != null)
-                    {
-                        if (weekPlan.struPlanCfg.Length > 0)
-                        {
-                            for (int i = 0; i < weekPlan.struPlanCfg.Length; i++)
-                            {
-                            MessageBox.Show(string.Format("Day {0}: Enabled--{1} Access control status--{2} Card reader verification mode--{3} Start-end time--{4} ({5})", i / 8 + 1, weekPlan.struPlanCfg[i].byEnable == 0 ? "No" : "Yes", Enum.GetName(typeof(HikDoorEnum.DoorStatus), weekPlan.struPlanCfg[i].byDoorStatus), Enum.GetName(typeof(HikDoorEnum.CardReadVerifyMode), weekPlan.struPlanCfg[i].byVerifyMode), string.Format("{0}:{1}:{2}-{3}:{4}:{5}", weekPlan.struPlanCfg[i].struTimeSegment.struBeginTime.byHour, weekPlan.struPlanCfg[i].struTimeSegment.struBeginTime.byMinute, weekPlan.struPlanCfg[i].struTimeSegment.struBeginTime.bySecond, weekPlan.struPlanCfg[i].struTimeSegment.struEndTime.byHour, weekPlan.struPlanCfg[i].struTimeSegment.struEndTime.byMinute, weekPlan.struPlanCfg[i].struTimeSegment.struEndTime.bySecond), DateTime.Now));
-                        }
-                    }
-                        MessageBox.Show(string.Format("Access control host--{0}  Card reader--{1}  Card reader weekly plan retrieval--{2}", doorIp, cardReadNo, "Success"));
-                        return true;
-                    }
-
-                }
-            MessageBox.Show(string.Format("Access control host--{0}  Card reader--{1}  Card reader weekly plan retrieval--{2}", doorIp, cardReadNo, "Failure"));
-            return false;
-                //}
-        }
-
-
-        public bool SetWeekPlanInfo(int userId, int chanel, HikDoorEnum.ConfigCommand cmd, ref CHCNetSDK.NET_DVR_WEEK_PLAN_CFG weekPlan)
-        {
-            uint dwSize = (uint)Marshal.SizeOf(weekPlan);
-            IntPtr ptrIpParaCfgV40 = Marshal.AllocHGlobal((int)dwSize);
-            Marshal.StructureToPtr(weekPlan, ptrIpParaCfgV40, false);
-            bool b = CHCNetSDK.NET_DVR_SetDVRConfig(userId, (uint)cmd, chanel, ptrIpParaCfgV40, dwSize);
-            int x =Convert.ToInt32( (NET_DVR_GetLastError().ToString()));
-            if (b)
-            {
-                weekPlan = (CHCNetSDK.NET_DVR_WEEK_PLAN_CFG)Marshal.PtrToStructure(ptrIpParaCfgV40, typeof(CHCNetSDK.NET_DVR_WEEK_PLAN_CFG));
-                Marshal.FreeHGlobal(ptrIpParaCfgV40);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public bool SetCardReadWeekPlanInfo(string doorIp, int cardReadNo, CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT[] plan, uint enable = 1)
-        {
-
-          
-                CHCNetSDK.NET_DVR_WEEK_PLAN_CFG weekPlan = new CHCNetSDK.NET_DVR_WEEK_PLAN_CFG() { byEnable = byte.Parse(enable.ToString()) };
-                weekPlan.struPlanCfg = plan;
-                weekPlan.dwSize = (uint)Marshal.SizeOf(weekPlan);
-               
-                if (SetWeekPlanInfo(m_UserID, cardReadNo, HikDoorEnum.ConfigCommand.NET_DVR_SET_VERIFY_WEEK_PLAN, ref weekPlan))
-                {
-                MessageBox.Show(string.Format("Access control host--{0}  Card reader--{1}  Card reader weekly plan enable--{2}", doorIp, cardReadNo, weekPlan.byEnable == 0 ? "No" : "Yes"));
-                if (weekPlan.struPlanCfg.Length > 0)
-                    {
-                        for (int j = 0; j < weekPlan.struPlanCfg.Length; j++)
-                        {
-
-                        MessageBox.Show(string.Format("Day {0}: Enabled--{1} Access control status--{2} Card reader verification mode--{3} Start-end time--{4} ({5})",
-                            j / 8 + 1,
-                            weekPlan.struPlanCfg[j].byEnable == 0 ? "No" : "Yes",
-                            Enum.GetName(typeof(HikDoorEnum.DoorStatus), weekPlan.struPlanCfg[j].byDoorStatus),
-                            Enum.GetName(typeof(HikDoorEnum.CardReadVerifyMode), weekPlan.struPlanCfg[j].byVerifyMode),
-                            string.Format("{0}:{1}:{2}-{3}:{4}:{5}",
-                                            weekPlan.struPlanCfg[j].struTimeSegment.struBeginTime.byHour,
-                                            weekPlan.struPlanCfg[j].struTimeSegment.struBeginTime.byMinute,
-                                            weekPlan.struPlanCfg[j].struTimeSegment.struBeginTime.bySecond,
-                                            weekPlan.struPlanCfg[j].struTimeSegment.struEndTime.byHour,
-                                            weekPlan.struPlanCfg[j].struTimeSegment.struEndTime.byMinute,
-                                            weekPlan.struPlanCfg[j].struTimeSegment.struEndTime.bySecond),
-                            DateTime.Now));
-
-                    }
-                }
-                MessageBox.Show(string.Format("Access control host--{0}  Card reader--{1}  Card reader weekly plan setting--{2}", doorIp, cardReadNo, "Success"));
-                return true;
-                }
-                int x = (int)NET_DVR_GetLastError();
-                MessageBox.Show(string.Format("Access control host--{0}  Card reader--{1}  Card reader weekly plan setting--{2}", doorIp, cardReadNo, "Failure"));
-                return false;
-        }
-
+        const int NET_DVR_GET_WEEK_PLAN_CFG = 2124; //get door status week plan config 
+       
         const int MAX_DAYS = 7; // Assuming there are 7 days in a week
 
-        /*public void SetVerifyWeekPlan(int lUserID)
+        //Code below runs succesfully but device does not react to authentication
+        public void SetVerifyWeekPlanAndCardReaderPlan(int lUserID)
         {
-            CHCNetSDK.NET_DVR_WEEK_PLAN_CFG struWeekPlan2 = new CHCNetSDK.NET_DVR_WEEK_PLAN_CFG();
-            struWeekPlan2.dwSize = (uint)Marshal.SizeOf(struWeekPlan2);
-            struWeekPlan2.byEnable = 1; // Enable week schedule
+            //  Week plan configuration
+            CHCNetSDK.NET_DVR_WEEK_PLAN_CFG weekPlan = new CHCNetSDK.NET_DVR_WEEK_PLAN_CFG();
+            weekPlan.dwSize = (uint)Marshal.SizeOf(weekPlan);
+            weekPlan.byEnable = 1; // Enable week schedule
 
-            CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT struSinglePlanSegment = new CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT();
-            CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT lpPlanSegment = struSinglePlanSegment;
-            struSinglePlanSegment.byEnable = 1;
-            struSinglePlanSegment.byVerifyMode = 4; // Authentication mode: card or password
-            struSinglePlanSegment.struTimeSegment.struBeginTime.byHour = 0; // Start time
-            struSinglePlanSegment.struTimeSegment.struBeginTime.byMinute = 0;
-            struSinglePlanSegment.struTimeSegment.struBeginTime.bySecond = 0;
-            struSinglePlanSegment.struTimeSegment.struEndTime.byHour = 23; // End time
-            struSinglePlanSegment.struTimeSegment.struEndTime.byMinute = 59;
-            struSinglePlanSegment.struTimeSegment.struEndTime.bySecond = 59;
+            // Single plan segment for each day
+            CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT singlePlanSegment = new CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT();
+            singlePlanSegment.byEnable = 1;
+            singlePlanSegment.byVerifyMode = 4; // Authentication mode: card or password
+            singlePlanSegment.struTimeSegment.struBeginTime.byHour = 7; // Start time
+            singlePlanSegment.struTimeSegment.struBeginTime.byMinute = 0;
+            singlePlanSegment.struTimeSegment.struBeginTime.bySecond = 0;
+            singlePlanSegment.struTimeSegment.struEndTime.byHour = 10; // End time
+            singlePlanSegment.struTimeSegment.struEndTime.byMinute = 59;
+            singlePlanSegment.struTimeSegment.struEndTime.bySecond = 59;
 
-            // Define struPlanCfg as a jagged array
+            // Initialize the array for plan configurations
+            weekPlan.struPlanCfg = new CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT[CHCNetSDK.MAX_DAYS * CHCNetSDK.MAX_TIMESEGMENT_V30];
 
-
-            // Initialize struWeekPlan2.struPlanCfg
-            // Initialize struPlanCfg
-            struWeekPlan2.struPlanCfg = new NET_DVR_SINGLE_PLAN_SEGMENT[MAX_DAYS * MAX_TIMESEGMENT_V30]; ;
-            // Up to 8 time periods can be set for each day, setting one period for each day
-            for (int i = 0; i < MAX_DAYS; i++)
+            // Copy the single plan segment to each day
+            for (int i = 0; i < CHCNetSDK.MAX_DAYS; i++)
             {
-                struWeekPlan2.struPlanCfg[i].Init();
+                weekPlan.struPlanCfg[i].Init();
+                Array.Copy(new CHCNetSDK.NET_DVR_SINGLE_PLAN_SEGMENT[] { singlePlanSegment }, 0, weekPlan.struPlanCfg, i * CHCNetSDK.MAX_TIMESEGMENT_V30, 1);
             }
 
-            IntPtr ptrWeekPlanConfig = Marshal.AllocHGlobal(Marshal.SizeOf(struWeekPlan2));
-            Marshal.StructureToPtr(struWeekPlan2, ptrWeekPlanConfig, false);
+            IntPtr ptrWeekPlanConfig = Marshal.AllocHGlobal(Marshal.SizeOf(weekPlan));
+            Marshal.StructureToPtr(weekPlan, ptrWeekPlanConfig, false);
 
-            bool bRet3 = CHCNetSDK.NET_DVR_SetDVRConfig(lUserID, CHCNetSDK.NET_DVR_SET_VERIFY_WEEK_PLAN, 2,
-            ptrWeekPlanConfig, (uint)Marshal.SizeOf(struWeekPlan2));
+            // Set week plan configuration
+            bool setWeekPlanSuccess = CHCNetSDK.NET_DVR_SetDVRConfig(lUserID, CHCNetSDK.NET_DVR_SET_VERIFY_WEEK_PLAN, 1,
+                ptrWeekPlanConfig, (uint)Marshal.SizeOf(weekPlan));
 
             Marshal.FreeHGlobal(ptrWeekPlanConfig);
 
-            if (!bRet3)
+            if (!setWeekPlanSuccess)
             {
                 MessageBox.Show($"Setting week schedule for card reader authentication mode failed, error: {CHCNetSDK.NET_DVR_GetLastError()}");
                 CHCNetSDK.NET_DVR_Logout_V30(lUserID);
                 CHCNetSDK.NET_DVR_Cleanup();
                 return;
             }
-            else
-            {
-                MessageBox.Show("SuckSes");
-            }
-        }*/
 
-           
+            // Card reader plan configuration
+            CHCNetSDK.NET_DVR_CARD_READER_PLAN cardReaderPlan = new CHCNetSDK.NET_DVR_CARD_READER_PLAN();
+            cardReaderPlan.dwSize = (uint)Marshal.SizeOf(cardReaderPlan);
+            cardReaderPlan.dwTemplateNo = 1;
+
+            
+            IntPtr ptrCardReaderPlanConfig = Marshal.AllocHGlobal(Marshal.SizeOf(cardReaderPlan));
+            Marshal.StructureToPtr(cardReaderPlan, ptrCardReaderPlanConfig, false);
+
+            // Set card reader plan configuration
+            bool setCardReaderPlanSuccess = CHCNetSDK.NET_DVR_SetDVRConfig(lUserID, CHCNetSDK.NET_DVR_SET_CARD_READER_PLAN, 1,
+                ptrCardReaderPlanConfig, (uint)Marshal.SizeOf(cardReaderPlan));
+
+            Marshal.FreeHGlobal(ptrCardReaderPlanConfig);
+
+            if (!setCardReaderPlanSuccess)
+            {
+                MessageBox.Show($"Setting card reader plan configuration failed, error: {CHCNetSDK.NET_DVR_GetLastError()}");
+                CHCNetSDK.NET_DVR_Logout_V30(lUserID);
+                CHCNetSDK.NET_DVR_Cleanup();
+                return;
+            }
+
+            MessageBox.Show("Week schedule and card reader plan configuration successfully set");
+        }
+
+
         // Methods for door control    
         private void OpenDoor()
         {
